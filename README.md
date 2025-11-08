@@ -1,5 +1,3 @@
 #ADA project
-#This will have my ADA work and I want it to show
-
+#This is the beginning of my ADA final project 
 rm(data)
-#Changes that need to be updated to ensure it is working 
