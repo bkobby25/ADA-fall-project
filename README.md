@@ -303,6 +303,8 @@ model <- glm(stage_bin_num ~ period_cat,
              family = binomial)
 
 summary(model)
+library(broom)
+tidy(model, exponentiate = TRUE, conf.int = TRUE)
 
 odds.n.ends(model)
 
@@ -402,6 +404,8 @@ mod_full <- glm(
 
 library(broom)
 tidy(mod_full, exponentiate = TRUE, conf.int = TRUE)
+
+odds.n.ends(mod_full)
 
 str(HNC_ex$race_cat)
 
@@ -546,3 +550,32 @@ pred_prob_int <- fitted(mod_int2)
 roc_int <- roc(response = mod_int2$y, predictor = pred_prob_int)
 auc(roc_int)
 
+
+##graph predicted probabilities 
+em_period_race <- emmeans(mod_int2, ~ period_cat | race_cat, type = "response")
+
+# Convert to dataframe
+em_df <- as.data.frame(em_period_race)
+head(em_df)
+
+
+##plot of predicted probabilities 
+ggplot(em_df, aes(x = period_cat, y = prob, color = race_cat, group = race_cat)) +
+  geom_line(linewidth = 1.3) +
+  geom_point(size = 3) +
+  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL, fill = race_cat),
+              alpha = 0.15, color = NA) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    title = "Adjusted Predicted Probability of Late-Stage Diagnosis",
+    subtitle = "By Diagnosis Period and Race/Ethnicity",
+    x = "Diagnosis Period",
+    y = "Predicted Probability (Late Stage)",
+    color = "Race/Ethnicity",
+    fill = "Race/Ethnicity"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    legend.position = "right",
+    panel.grid.minor = element_blank()
+  )
