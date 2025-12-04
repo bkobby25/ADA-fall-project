@@ -8,7 +8,7 @@ The purpose of this project is to evaluate whether later diagnostic periods are 
 This analysis was completed as part of an applied epidemiology and data analysis assignment using R.
 
 #Files Included
-HNC1_Kobby.txt – Dataset used for the project
+HNC1_Kobby.txt – Dataset used for the project (sent to email)
 HNC_analysis.R – Main R script for data cleaning, modeling, and visualization
 README.md – Project documentation (this file)
 
