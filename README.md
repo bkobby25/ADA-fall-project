@@ -33,7 +33,6 @@ table(HNCADA$Year.of.diagnosis)
 HNC_c <- HNCADA %>%
   filter(
     First.malignant.primary.indicator == "Yes",
-   
      )
 
 HNC_c2 <- HNC_c %>%
@@ -49,7 +48,7 @@ exc2 <- nrow(HNC_c) - nrow(HNC_c2)
 #combine the formulas
 HNC_clean <- HNC_c2 %>%
   filter(    First.malignant.primary.indicator == "Yes",
-     Year.of.diagnosis >= 2004,
+     Year.of.diagnosis >= 2004, 
       )
 
 ##create a figure 1
@@ -64,14 +63,17 @@ digraph flowchart{
   node1 [label = '@@1']
   node2 [label = '@@2']
   node3 [label = '@@3']
+  node4 [label = '@@4']
 
-  node1 -> node2 -> node3
+  node1 -> node2 -> node3 -> node4
 }
 
-[1]: 'Persons diagnosed with HNC between 2000 - 2021 \\n n = 287,069'
-[2]: 'Excluding 57,126 individuals who did not have \\n first primary malignant HNC tumor \\n n = 229,943'
-[3]: 'Excluding 36,335 individuals diagnosed before 2004 \\n n = 193,608'
+[1]: 'Patients diagnosed with HNC between 2000 - 2021 \\n n = 287,069'
+[2]: 'Excluding 57,126 patients who did not have \\n first primary malignant HNC tumor n = 229,943'
+[3]: 'Excluding 36,335 patients diagnosed before 2004 \\n n = 193,608'
+[4]: 'Excluding 11,344 patients with missing stage/income data \\n n = 182,264'
 ")
+
 
 ###export figure 1
 
@@ -224,6 +226,9 @@ HNC_ex <- HNC_clean %>%
   filter(if_all(all_of(model_vars), ~ !is.na(.)))
   
 
+HNC_ex <- HNC_ex %>% 
+  filter(!is.na(hh_income_cat))
+  
 #finding out how many observations are left for a complete case analysis after 
 #the Unstaged/ Unknown stage was removed
 nrow(HNC_ex)
@@ -239,7 +244,7 @@ HNC_ex <- HNC_ex %>%
         "$45,000 - $49,999",
         "$50,000 - $54,999",
         "$55,000 - $59,999"
-      ) ~ "<=59k",
+      ) ~ "<60k",
 
       hh_income %in% c(
         "$60,000 - $64,999",
@@ -374,7 +379,7 @@ HNC_ex$age_cat         <- factor(HNC_ex$age_cat,
                                  ordered = FALSE)
 
 HNC_ex$hh_income_cat   <- factor(HNC_ex$hh_income_cat,
-                                 levels = c("<=59k","60-79k","80-99k","100k+"))
+                                 levels = c("<60k","60-79k","80-99k","100k+"))
 
 HNC_ex$Sex             <- factor(HNC_ex$Sex)  
 
@@ -394,11 +399,12 @@ label(HNC_ex$hh_income_cat) <- "Adjusted Household Income"
 
 table1(~ age_cat + Sex + race_cat  + stage_bin_num  + hh_income_cat + period_cat , HNC_ex)
 
-
+colnames(HNC_ex)
+table(HNC_ex$stage_bin)
 
 #running a multivariable model
 mod_full <- glm(
-  stage_num ~ period_cat + age_cat + Sex + hh_income_cat,
+  stage_num ~ period_cat + age_cat + Sex + race_cat + hh_income_cat, 
   data = HNC_ex,
   family = binomial)
 
@@ -413,8 +419,8 @@ str(HNC_ex$race_cat)
 #HNC_ex$race_cat <- case_when(
 #HNC_ex$race == "Non-Hispanic White" ~ "NHW",
 #HNC_ex$race == "Non-Hispanic Black" ~ "NHB",
-# HNC_ex$race == "Hispanic (All races)" ~ "Hispanic",
-#  TRUE ~ "Other")
+#HNC_ex$race == "Hispanic (All races)" ~ "Hispanic",
+#TRUE ~ "Other")
 
 table(HNC_ex$race_cat)
 
