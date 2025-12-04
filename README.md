@@ -25,6 +25,7 @@ The analysis code:
 
 ##How to Run the Code
 -Download or clone this repository.
+-DOwnload dataset from link sent to email
 -Open HNC_analysis.R in RStudio.
 -Ensure that the necessary packages are installed (tidyverse, table1, car, ResourceSelection, pROC, etc.).
 -Set your working directory to the project folder.
